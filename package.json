@@ -1,0 +1,24 @@
+{
+  "name": "shopagent",
+  "version": "1.0.0",
+  "description": "A collaborative shopping agent for iMessage",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "build": "tsc",
+    "test": "tsx src/test.ts"
+  },
+  "dependencies": {
+    "spectrum-ts": "latest",
+    "dotenv": "^16.4.5",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.16.0",
+    "@types/node": "^20.14.0",
+    "@types/uuid": "^10.0.0"
+  }
+}
