@@ -145,8 +145,8 @@ export class SessionManager {
     await send(`🎉 The group has decided on: ${winningProduct.name}!`);
     await send(`The total is $${winningProduct.price}. Split between ${votersCount} people, that's $${splitCost} each.`);
 
-    await send(richlink(winningProduct.url, "🛒 Buy Now"));
-    await send(richlink(venmoUrl, "💸 Pay your share on Venmo"));
+    await send(richlink(winningProduct.url));
+    await send(richlink(venmoUrl));
 
     // Cleanup after a delay
     setTimeout(() => {

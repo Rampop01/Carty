@@ -40,12 +40,12 @@ console.log("");
 for await (const [space, message] of app.messages) {
   await space.responding(async () => {
     try {
-      const text = message.text?.trim();
+      const text = (message as any).text?.trim();
       if (!text) return;
 
       const chatId = space.id || "default";
       const senderId = message.sender?.id || "unknown";
-      const senderName = message.sender?.name || message.sender?.id || "Shopper";
+      const senderName = (message.sender as any).name || message.sender?.id || "Shopper";
 
       const send = async (msg: string) => {
         await message.reply(msg);

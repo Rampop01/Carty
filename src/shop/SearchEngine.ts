@@ -41,7 +41,7 @@ export async function searchLiveProducts(query: string): Promise<SearchResult | 
       return null;
     }
 
-    const data = await response.json();
+    const data = await response.json() as any;
     
     // Extract the top shopping results
     const results = data.shopping_results || [];
