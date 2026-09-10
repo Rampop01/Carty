@@ -6,7 +6,7 @@
 import { sessionManager, type SendFn } from "../shop/SessionManager.js";
 
 export interface ParsedCommand {
-  type: "shop" | "decide" | "help" | "unknown";
+  type: "shop" | "cancel" | "help" | "unknown";
   args?: string;
 }
 
@@ -20,9 +20,9 @@ export function parseCommand(text: string): ParsedCommand {
     return { type: "shop", args: args.trim() };
   }
 
-  // /decide or /buy
-  if (lower === "/decide" || lower === "decide" || lower === "/buy" || lower === "buy") {
-    return { type: "decide" };
+  // /cancel
+  if (lower === "/cancel" || lower === "cancel") {
+    return { type: "cancel" };
   }
 
   if (lower === "/help" || lower === "help") {
@@ -35,8 +35,6 @@ export function parseCommand(text: string): ParsedCommand {
 export async function handleCommand(
   command: ParsedCommand,
   chatId: string,
-  senderId: string,
-  senderName: string,
   send: SendFn
 ): Promise<void> {
   switch (command.type) {
@@ -45,27 +43,27 @@ export async function handleCommand(
         await send(`🛍️ Carty\n\nUsage: /shop <what you want>\nExample: /shop Bluetooth speaker under $150`);
         return;
       }
-      await sessionManager.startShopping(chatId, command.args, senderId, senderName, send);
+      await sessionManager.startShopping(chatId, command.args, send);
       break;
 
-    case "decide":
-      await sessionManager.decide(chatId, send);
+    case "cancel":
+      await sessionManager.cancelSession(chatId, send);
       break;
 
     case "help":
       await send(
         [
-          "🛍️ Carty — Commands",
+          "🛍️ Carty — Personal Shopper",
           "",
           "/shop <item> — Search for products",
-          "vote <1/2/3> — Vote for an option",
-          "/decide — End voting and announce winner"
+          "select <1/2/3> — Choose an option",
+          "/cancel — Cancel current shopping session"
         ].join("\n")
       );
       break;
 
     case "unknown":
-      // Do nothing for unknown commands here; vote handler will catch conversational votes
+      // Do nothing for unknown commands here; selection handler will catch natural text
       break;
   }
 }

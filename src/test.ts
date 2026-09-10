@@ -5,7 +5,7 @@
 
 import "dotenv/config";
 import { parseCommand, handleCommand } from "./handlers/commandHandler.js";
-import { handleVote } from "./handlers/voteHandler.js";
+import { handleSelection } from "./handlers/selectionHandler.js";
 
 // Simulated send function
 const send = async (msg: any) => {
@@ -23,21 +23,18 @@ const send = async (msg: any) => {
 // Simulate an incoming message
 async function simulateMessage(
   chatId: string,
-  senderId: string,
-  senderName: string,
   text: string
 ) {
-  console.log(`👤 ${senderName}: ${text}`);
+  console.log(`👤 Shopper: ${text}`);
   
   const command = parseCommand(text);
   if (command.type !== "unknown") {
-    await handleCommand(command, chatId, senderId, senderName, send);
+    await handleCommand(command, chatId, send);
     return;
   }
 
-  const isVote = await handleVote(chatId, senderId, senderName, text, send);
-  if (!isVote) {
-    // Ignored message
+  const isSelection = await handleSelection(chatId, text, send);
+  if (!isSelection) {
     // console.log(`(Message ignored by Carty)`);
   }
 }
@@ -47,28 +44,22 @@ async function simulateMessage(
 // ──────────────────────────────────────────────
 
 async function runSimulation() {
-  console.log("🛍️ Carty — Local Test Simulation");
+  console.log("🛍️ Carty — Local Test Simulation (1-on-1)");
   console.log("=========================================\n");
 
-  const chatId = "test-group-chat";
+  const chatId = "test-dm-chat";
   
-  const p1 = { id: "p1", name: "Rahmat" };
-  const p2 = { id: "p2", name: "Sarah" };
-  const p3 = { id: "p3", name: "David" };
+  // 1. Start a search
+  await simulateMessage(chatId, "/shop Bluetooth speaker under $150");
 
-  // 1. Rahmat starts a search
-  await simulateMessage(chatId, p1.id, p1.name, "/shop Bluetooth speaker under $150");
+  // 2. Select option 1
+  await simulateMessage(chatId, "select 1");
 
-  // 2. Everyone votes
-  await simulateMessage(chatId, p1.id, p1.name, "I vote 1");
-  await simulateMessage(chatId, p2.id, p2.name, "vote 1");
-  await simulateMessage(chatId, p3.id, p3.name, "Put me down for 3");
+  // 3. Choose fulfillment
+  await simulateMessage(chatId, "do it for me");
 
-  // 3. Sarah changes her mind
-  await simulateMessage(chatId, p2.id, p2.name, "Wait, vote 3");
-
-  // 4. Rahmat decides
-  await simulateMessage(chatId, p1.id, p1.name, "/decide");
+  // 4. Provide email
+  await simulateMessage(chatId, "hello@example.com");
 }
 
 runSimulation().catch(console.error);
