@@ -2,6 +2,8 @@
 // Carty — Live Search Engine (SerpApi)
 // ============================================================
 
+import axios from "axios";
+
 export interface Product {
   id: string;
   name: string;
@@ -19,11 +21,11 @@ export interface SearchResult {
 /**
  * Perform a live search via SerpApi Google Shopping.
  */
-export async function searchLiveProducts(query: string): Promise<SearchResult | null> {
+export async function searchLiveProducts(query: string): Promise<SearchResult | string | null> {
   const apiKey = process.env.SERPAPI_KEY;
   if (!apiKey) {
     console.error("❌ Missing SERPAPI_KEY in .env");
-    return null;
+    return "Missing SERPAPI_KEY in .env";
   }
 
   try {
@@ -35,13 +37,17 @@ export async function searchLiveProducts(query: string): Promise<SearchResult | 
     url.searchParams.append("hl", "en");
     url.searchParams.append("gl", "us");
 
-    const response = await fetch(url.toString());
-    if (!response.ok) {
-      console.error("❌ SerpApi request failed:", response.statusText);
-      return null;
+    const response = await axios.get(url.toString(), {
+      timeout: 45000,
+      validateStatus: () => true // Handle errors manually
+    });
+
+    if (response.status !== 200) {
+      const errStr = typeof response.data === 'object' ? JSON.stringify(response.data) : response.statusText;
+      return `SerpApi HTTP Error ${response.status}: ${errStr}`;
     }
 
-    const data = await response.json() as any;
+    const data = response.data;
     
     // Extract the top shopping results
     const results = data.shopping_results || [];
@@ -70,12 +76,14 @@ export async function searchLiveProducts(query: string): Promise<SearchResult | 
       let name = item.title || "Unknown Product";
       if (name.length > 35) name = name.substring(0, 32) + "...";
 
+      const rawUrl = item.product_link || item.link || "https://google.com/shopping";
+      
       return {
         id: item.product_id || `product_${index}`,
         name,
         price,
         highlight,
-        url: item.link || "https://google.com/shopping",
+        url: encodeURI(rawUrl),
       };
     });
 
@@ -85,8 +93,8 @@ export async function searchLiveProducts(query: string): Promise<SearchResult | 
       products
     };
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Error fetching from SerpApi:", error);
-    return null;
+    return `SerpApi Exception: ${error.message || String(error)}`;
   }
 }
