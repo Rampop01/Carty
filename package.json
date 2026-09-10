@@ -11,14 +11,15 @@
     "test": "tsx src/test.ts"
   },
   "dependencies": {
-    "spectrum-ts": "latest",
+    "axios": "^1.20.0",
     "dotenv": "^16.4.5",
+    "spectrum-ts": "latest",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.5.0",
-    "tsx": "^4.16.0",
     "@types/node": "^20.14.0",
-    "@types/uuid": "^10.0.0"
+    "@types/uuid": "^10.0.0",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.0"
   }
 }
